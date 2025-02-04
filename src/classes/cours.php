@@ -333,13 +333,21 @@
         }
 
         public static function bestThreeCours($conn){
-            $getCours = $conn->prepare("SELECT *,COUNT(mycours.id_cours) AS total FROM cours LEFT JOIN mycours ON mycours.id_cours = cours.id_cours INNER JOIN categorie ON cours.id_categorie = categorie.id_categorie GROUP BY cours.id_cours ORDER BY total DESC LIMIT 3");
+            $getCours = $conn->prepare("SELECT cours.id_cours, categorie.name AS category_name, mycours.id_cours, categorie.id_categorie, COUNT(mycours.id_cours) AS total
+                FROM cours
+                LEFT JOIN mycours ON mycours.id_cours = cours.id_cours
+                INNER JOIN categorie ON cours.id_categorie = categorie.id_categorie
+                GROUP BY cours.id_cours, categorie.name, mycours.id_cours, categorie.id_categorie
+                ORDER BY total DESC
+                LIMIT 3;
+            ");
             if($getCours->execute()){
                 return $getCours;
             }else{
                 return null;
             }
         }
+        
 
         public static function allCoursCount($conn){
             $getCoursCount = $conn->prepare("SELECT count(*) as total FROM cours WHERE id_approved = '1'");
